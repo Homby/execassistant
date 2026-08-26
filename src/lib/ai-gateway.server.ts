@@ -16,11 +16,11 @@ export function createLovableAiGatewayProvider(apiKey: string) {
 
 /** Shared executive context injected into every structured prompt. */
 export interface ExecContext {
-  role?: string;
-  now?: string;
-  calendar?: string;
-  tasks?: string;
-  preferences?: string;
+  role?: string | undefined;
+  now?: string | undefined;
+  calendar?: string | undefined;
+  tasks?: string | undefined;
+  preferences?: string | undefined;
 }
 
 function contextBlock(ctx: ExecContext | undefined) {
@@ -79,10 +79,10 @@ export async function generateEmailImpl(input: {
   instruction: string;
   tone: string;
   purpose: string;
-  recipient?: string;
-  transform?: "shorten" | "expand" | "improve" | null;
-  previous?: string | null;
-  ctx?: ExecContext;
+  recipient?: string | undefined;
+  transform?: "shorten" | "expand" | "improve" | null | undefined;
+  previous?: string | null | undefined;
+  ctx?: ExecContext | undefined;
 }): Promise<EmailResult> {
   const transformNote = input.transform
     ? `\nThis is a revision. Apply this change to the previous draft: ${input.transform.toUpperCase()}.\nPREVIOUS DRAFT:\n${input.previous ?? ""}`
@@ -125,7 +125,7 @@ const emptySummary: MeetingSummary = {
 
 export async function summariseMeetingImpl(input: {
   notes: string;
-  ctx?: ExecContext;
+  ctx?: ExecContext | undefined;
 }): Promise<MeetingSummary> {
   const raw = await run(
     `Turn these unstructured meeting notes into an executive-ready structured summary.
@@ -163,7 +163,7 @@ export interface TaskPlan {
 
 const emptyPlan: TaskPlan = { overview: "", tasks: [], schedule: [], bottlenecks: [] };
 
-export async function planTasksImpl(input: { goal: string; ctx?: ExecContext }): Promise<TaskPlan> {
+export async function planTasksImpl(input: { goal: string; ctx?: ExecContext | undefined }): Promise<TaskPlan> {
   const raw = await run(
     `Break this executive objective into an actionable plan.
 OBJECTIVE / TASK LIST:
@@ -199,7 +199,7 @@ const emptyBriefing: Briefing = {
   recommendations: [],
 };
 
-export async function briefingImpl(input: { ctx?: ExecContext }): Promise<Briefing> {
+export async function briefingImpl(input: { ctx?: ExecContext | undefined }): Promise<Briefing> {
   const raw = await run(
     `Produce today's executive briefing from the context provided. Be specific and reference real items from the context. Maximum 3 bullets per section, each under 30 words.
 
@@ -219,7 +219,7 @@ export interface AskResult {
   actions: string[];
 }
 
-export async function askImpl(input: { question: string; ctx?: ExecContext }): Promise<AskResult> {
+export async function askImpl(input: { question: string; ctx?: ExecContext | undefined }): Promise<AskResult> {
   const raw = await run(
     `Answer the executive's question using the context. Be direct — lead with the answer.
 QUESTION: ${input.question}
