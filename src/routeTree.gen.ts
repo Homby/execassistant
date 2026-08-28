@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BriefingRouteImport } from './routes/briefing'
 import { Route as CalendarRouteImport } from './routes/calendar'
+import { Route as EmailRouteImport } from './routes/email'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,44 @@ const CalendarRoute = CalendarRouteImport.update({
   path: '/calendar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmailRoute = EmailRouteImport.update({
+  id: '/email',
+  path: '/email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/briefing': typeof BriefingRoute
   '/calendar': typeof CalendarRoute
+  '/email': typeof EmailRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/briefing': typeof BriefingRoute
   '/calendar': typeof CalendarRoute
+  '/email': typeof EmailRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/briefing': typeof BriefingRoute
   '/calendar': typeof CalendarRoute
+  '/email': typeof EmailRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/briefing' | '/calendar'
+  fullPaths: '/' | '/briefing' | '/calendar' | '/email'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/briefing' | '/calendar'
-  id: '__root__' | '/' | '/briefing' | '/calendar'
+  to: '/' | '/briefing' | '/calendar' | '/email'
+  id: '__root__' | '/' | '/briefing' | '/calendar' | '/email'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BriefingRoute: typeof BriefingRoute
   CalendarRoute: typeof CalendarRoute
+  EmailRoute: typeof EmailRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CalendarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/email': {
+      id: '/email'
+      path: '/email'
+      fullPath: '/email'
+      preLoaderRoute: typeof EmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BriefingRoute: BriefingRoute,
   CalendarRoute: CalendarRoute,
+  EmailRoute: EmailRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
