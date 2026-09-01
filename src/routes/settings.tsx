@@ -23,7 +23,7 @@ export const Route = createFileRoute("/settings")({
       },
     ],
   }),
-  component: SettingsPage;
+  component: SettingsPage,
 });
 
 const statusStyles: Record<string, string> = {
