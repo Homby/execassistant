@@ -1,0 +1,130 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { Plug, Sliders, User } from "lucide-react";
+import { useState } from "react";
+import avatar from "@/assets/exec-avatar.jpg";
+import { AppShell } from "@/components/app-shell";
+import { Panel } from "@/components/panel";
+import { Button } from "@/components/ui/button";
+import { execUser, integrations } from "@/lib/mock-data";
+
+export const Route = createFileRoute("/settings")({
+  head: () => ({
+    meta: [
+      { title: "Settings — Exec Assistant" },
+      {
+        name: "description",
+        content:
+          "Manage your executive profile, working hours, AI assistant preferences and connected calendar, email and meeting tools.",
+      },
+      { property: "og:title", content: "Settings — Exec Assistant" },
+      {
+        property: "og:description",
+        content: "Profile, working hours, AI tone preferences and integrations for your workspace.",
+      },
+    ],
+  }),
+  component: SettingsPage,
+});
+
+const statusStyles: Record<string, string> = {
+  connected: "bg-accent/10 text-accent",
+  pending: "bg-warning/10 text-warning",
+  available: "bg-muted text-muted-foreground",
+};
+
+const prefs = [
+  { id: "tone", label: "Default email tone", options: ["Direct", "Diplomatic", "Warm"] },
+  { id: "length", label: "Summary length", options: ["Concise", "Standard", "Detailed"] },
+  { id: "brief", label: "Briefing delivery", options: ["On demand", "07:00 daily", "Weekdays only"] },
+] as const;
+
+function SettingsPage() {
+  const [selected, setSelected] = useState<Record<string, string>>({
+    tone: "Direct",
+    length: "Concise",
+    brief: "On demand",
+  });
+
+  return (
+    <AppShell title="Settings" subtitle="Profile, preferences and integrations">
+      <div className="space-y-6">
+        <Panel title={<span className="flex items-center gap-2"><User className="size-4 text-accent" />Executive profile</span>}>
+          <div className="flex flex-wrap items-center gap-4">
+            <img src={avatar} alt="" className="size-16 rounded-full object-cover" />
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-foreground">{execUser.name}</p>
+              <p className="text-xs text-muted-foreground">
+                {execUser.role} · {execUser.company}
+              </p>
+              <p className="text-xs text-muted-foreground">{execUser.email}</p>
+            </div>
+            <Button variant="outline" size="sm" className="ml-auto rounded-full">
+              Edit profile
+            </Button>
+          </div>
+
+          <dl className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-xl border border-border p-4">
+              <dt className="label-caps">Working hours</dt>
+              <dd className="mt-1 text-sm font-medium text-foreground">{execUser.workingHours}</dd>
+            </div>
+            <div className="rounded-xl border border-border p-4">
+              <dt className="label-caps">Time zone</dt>
+              <dd className="mt-1 text-sm font-medium text-foreground">{execUser.timezone}</dd>
+            </div>
+          </dl>
+        </Panel>
+
+        <Panel title={<span className="flex items-center gap-2"><Sliders className="size-4 text-accent" />Assistant preferences</span>}>
+          <div className="space-y-5">
+            {prefs.map((p) => (
+              <div key={p.id}>
+                <p className="text-sm font-medium text-foreground">{p.label}</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {p.options.map((o) => (
+                    <button
+                      key={o}
+                      onClick={() => setSelected((s) => ({ ...s, [p.id]: o }))}
+                      className={
+                        selected[p.id] === o
+                          ? "rounded-full bg-ink px-3 py-1.5 text-xs font-semibold text-ink-foreground"
+                          : "rounded-full border border-border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                      }
+                    >
+                      {o}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Panel>
+
+        <Panel title={<span className="flex items-center gap-2"><Plug className="size-4 text-accent" />Integrations</span>}>
+          <ul className="divide-y divide-border">
+            {integrations.map((i) => (
+              <li key={i.id} className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground">{i.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {i.category} · {i.detail}
+                  </p>
+                </div>
+                <div className="flex shrink-0 items-center gap-3">
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-[11px] font-semibold capitalize ${statusStyles[i.status]}`}
+                  >
+                    {i.status}
+                  </span>
+                  <Button variant="outline" size="sm" className="rounded-full">
+                    {i.status === "connected" ? "Manage" : "Connect"}
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      </div>
+    </AppShell>
+  );
+}

@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
 export interface AiActionsProps {
-  copyText?: string;
+  copyText?: string | undefined;
   onRegenerate?: () => void;
   onShorten?: () => void;
   onExpand?: () => void;
