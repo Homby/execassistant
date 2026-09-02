@@ -1,10 +1,12 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Bell,
   CalendarDays,
   CheckSquare,
   LayoutDashboard,
   Lock,
+  LogOut,
   Mail,
   Menu,
   NotebookPen,
@@ -20,12 +22,14 @@ import avatar from "@/assets/exec-avatar.jpg";
 import { AskAssistantDialog } from "@/components/ask-assistant";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useProfile } from "@/hooks/use-profile";
+import { supabase } from "@/integrations/supabase/client";
 import { greeting, todayLabel } from "@/lib/exec-context";
-import { execUser, notifications } from "@/lib/mock-data";
+import { notifications } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 const nav = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/briefing", label: "Daily briefing", icon: Sun },
   { to: "/calendar", label: "Calendar", icon: CalendarDays },
   { to: "/email", label: "Email assistant", icon: Mail },
