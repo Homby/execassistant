@@ -5,7 +5,7 @@ import { Panel } from "@/components/panel";
 import { Button } from "@/components/ui/button";
 import { activityLog, execUser } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/security")({
+export const Route = createFileRoute("/_authenticated/security")({
   head: () => ({
     meta: [
       { title: "Privacy & security — Exec Assistant" },

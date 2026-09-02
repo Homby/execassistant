@@ -7,7 +7,7 @@ import { Panel } from "@/components/panel";
 import { Button } from "@/components/ui/button";
 import { execUser, integrations } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/settings")({
+export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
       { title: "Settings — Exec Assistant" },

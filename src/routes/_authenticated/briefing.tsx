@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { getBriefing } from "@/lib/ai.functions";
 import { buildExecContext, todayLabel } from "@/lib/exec-context";
 
-export const Route = createFileRoute("/briefing")({
+export const Route = createFileRoute("/_authenticated/briefing")({
   head: () => ({
     meta: [
       { title: "Daily executive briefing — Exec Assistant" },

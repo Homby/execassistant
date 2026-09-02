@@ -15,7 +15,7 @@ import { summariseMeeting } from "@/lib/ai.functions";
 import { buildExecContext } from "@/lib/exec-context";
 import { meetingNotesSample, todaysMeetings } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/meetings")({
+export const Route = createFileRoute("/_authenticated/meetings")({
   head: () => ({
     meta: [
       { title: "Meeting notes summarizer — Exec Assistant" },

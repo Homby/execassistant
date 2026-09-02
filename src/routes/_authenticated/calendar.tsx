@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { todaysMeetings, weekMeetings, type Meeting } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/calendar")({
+export const Route = createFileRoute("/_authenticated/calendar")({
   head: () => ({
     meta: [
       { title: "Calendar & schedule management — Exec Assistant" },

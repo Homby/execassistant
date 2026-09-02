@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { communications, priorityLabel, tasks, todaysMeetings } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "Exec Assistant — AI chief of staff for senior leaders" },

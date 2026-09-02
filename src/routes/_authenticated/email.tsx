@@ -24,7 +24,7 @@ import { generateEmail } from "@/lib/ai.functions";
 import { buildExecContext } from "@/lib/exec-context";
 import { communications, emailPurposes, emailTones } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/email")({
+export const Route = createFileRoute("/_authenticated/email")({
   head: () => ({
     meta: [
       { title: "AI email assistant for executives — Exec Assistant" },
