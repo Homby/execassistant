@@ -173,7 +173,7 @@ export function AppShell({
                 {title}
               </h1>
               <p className="truncate text-xs text-muted-foreground">
-                {subtitle ?? `${greeting()}, ${execUser.name.split(" ")[0]} · ${todayLabel()}`}
+                {subtitle ?? `${greeting()}, ${firstName} · ${todayLabel()}`}
               </p>
             </div>
 
