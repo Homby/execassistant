@@ -1,10 +1,17 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { Plug, Sliders, User } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import avatar from "@/assets/exec-avatar.jpg";
 import { AppShell } from "@/components/app-shell";
 import { Panel } from "@/components/panel";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useProfile } from "@/hooks/use-profile";
+import { updateMyProfile } from "@/lib/profile.functions";
 import { execUser, integrations } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/_authenticated/settings")({
