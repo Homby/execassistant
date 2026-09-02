@@ -128,6 +128,8 @@ export function AppShell({
   const [mobileOpen, setMobileOpen] = useState(false);
   const [askOpen, setAskOpen] = useState(false);
   const unread = notifications.filter((n) => n.unread).length;
+  const { data: profile } = useProfile();
+  const firstName = (profile?.fullName ?? "Executive").split(" ")[0];
 
   return (
     <div className="min-h-screen bg-background">
