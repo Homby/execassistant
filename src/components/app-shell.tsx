@@ -98,10 +98,19 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
       <div className="flex items-center gap-3 border-t border-sidebar-border px-5 py-4">
         <img src={avatar} alt="" className="size-9 rounded-full object-cover" />
-        <div className="min-w-0">
-          <p className="truncate text-sm font-medium">{execUser.name}</p>
-          <p className="truncate text-[11px] text-sidebar-foreground/60">{execUser.role}</p>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium">{profile?.fullName ?? "Executive"}</p>
+          <p className="truncate text-[11px] text-sidebar-foreground/60">
+            {profile?.jobTitle ?? profile?.email ?? ""}
+          </p>
         </div>
+        <button
+          onClick={handleSignOut}
+          aria-label="Sign out"
+          className="grid size-8 shrink-0 place-items-center rounded-lg text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+        >
+          <LogOut className="size-4" />
+        </button>
       </div>
     </div>
   );
