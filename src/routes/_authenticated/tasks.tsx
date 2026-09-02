@@ -17,7 +17,7 @@ import { buildExecContext } from "@/lib/exec-context";
 import { priorityLabel, tasks as seedTasks, type Priority } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/tasks")({
+export const Route = createFileRoute("/_authenticated/tasks")({
   head: () => ({
     meta: [
       { title: "AI task planner and prioritisation — Exec Assistant" },

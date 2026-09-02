@@ -1,13 +1,20 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { Plug, Sliders, User } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import avatar from "@/assets/exec-avatar.jpg";
 import { AppShell } from "@/components/app-shell";
 import { Panel } from "@/components/panel";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useProfile } from "@/hooks/use-profile";
+import { updateMyProfile } from "@/lib/profile.functions";
 import { execUser, integrations } from "@/lib/mock-data";
 
-export const Route = createFileRoute("/settings")({
+export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
       { title: "Settings — Exec Assistant" },
@@ -44,6 +51,35 @@ function SettingsPage() {
     length: "Concise",
     brief: "On demand",
   });
+  const { data: profile } = useProfile();
+  const queryClient = useQueryClient();
+  const update = useServerFn(updateMyProfile);
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({ fullName: "", jobTitle: "", company: "" });
+  const [saving, setSaving] = useState(false);
+
+  function startEditing() {
+    setForm({
+      fullName: profile?.fullName ?? "",
+      jobTitle: profile?.jobTitle ?? "",
+      company: profile?.company ?? "",
+    });
+    setEditing(true);
+  }
+
+  async function save() {
+    setSaving(true);
+    try {
+      await update({ data: form });
+      await queryClient.invalidateQueries({ queryKey: ["my-profile"] });
+      toast.success("Profile updated");
+      setEditing(false);
+    } catch {
+      toast.error("Could not save your profile. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <AppShell title="Settings" subtitle="Profile, preferences and integrations">
@@ -52,16 +88,67 @@ function SettingsPage() {
           <div className="flex flex-wrap items-center gap-4">
             <img src={avatar} alt="" className="size-16 rounded-full object-cover" />
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-foreground">{execUser.name}</p>
-              <p className="text-xs text-muted-foreground">
-                {execUser.role} · {execUser.company}
+              <p className="text-sm font-semibold text-foreground">
+                {profile?.fullName ?? "Executive"}
               </p>
-              <p className="text-xs text-muted-foreground">{execUser.email}</p>
+              <p className="text-xs text-muted-foreground">
+                {[profile?.jobTitle, profile?.company].filter(Boolean).join(" · ")}
+              </p>
+              <p className="text-xs text-muted-foreground">{profile?.email}</p>
             </div>
-            <Button variant="outline" size="sm" className="ml-auto rounded-full">
-              Edit profile
-            </Button>
+            {!editing && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="ml-auto rounded-full"
+                onClick={startEditing}
+              >
+                Edit profile
+              </Button>
+            )}
           </div>
+
+          {editing && (
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="fullName">Full name</Label>
+                <Input
+                  id="fullName"
+                  value={form.fullName}
+                  onChange={(e) => setForm({ ...form, fullName: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="jobTitle">Job title</Label>
+                <Input
+                  id="jobTitle"
+                  value={form.jobTitle}
+                  onChange={(e) => setForm({ ...form, jobTitle: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="company">Company</Label>
+                <Input
+                  id="company"
+                  value={form.company}
+                  onChange={(e) => setForm({ ...form, company: e.target.value })}
+                />
+              </div>
+              <div className="flex gap-2 sm:col-span-3">
+                <Button size="sm" className="rounded-full" onClick={save} disabled={saving}>
+                  Save changes
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="rounded-full"
+                  onClick={() => setEditing(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
 
           <dl className="mt-6 grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl border border-border p-4">
@@ -74,6 +161,7 @@ function SettingsPage() {
             </div>
           </dl>
         </Panel>
+
 
         <Panel title={<span className="flex items-center gap-2"><Sliders className="size-4 text-accent" />Assistant preferences</span>}>
           <div className="space-y-5">

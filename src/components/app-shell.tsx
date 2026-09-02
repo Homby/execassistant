@@ -1,10 +1,12 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   Bell,
   CalendarDays,
   CheckSquare,
   LayoutDashboard,
   Lock,
+  LogOut,
   Mail,
   Menu,
   NotebookPen,
@@ -20,12 +22,14 @@ import avatar from "@/assets/exec-avatar.jpg";
 import { AskAssistantDialog } from "@/components/ask-assistant";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useProfile } from "@/hooks/use-profile";
+import { supabase } from "@/integrations/supabase/client";
 import { greeting, todayLabel } from "@/lib/exec-context";
-import { execUser, notifications } from "@/lib/mock-data";
+import { notifications } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 const nav = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/briefing", label: "Daily briefing", icon: Sun },
   { to: "/calendar", label: "Calendar", icon: CalendarDays },
   { to: "/email", label: "Email assistant", icon: Mail },
@@ -37,6 +41,17 @@ const nav = [
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { data: profile } = useProfile();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  async function handleSignOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  }
+
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-3 px-5 py-6">
@@ -51,7 +66,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
       <nav className="flex-1 space-y-1 px-3">
         {nav.map(({ to, label, icon: Icon }) => {
-          const active = to === "/" ? pathname === "/" : pathname.startsWith(to);
+          const active = pathname.startsWith(to);
           return (
             <Link
               key={to}
@@ -83,10 +98,19 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
       <div className="flex items-center gap-3 border-t border-sidebar-border px-5 py-4">
         <img src={avatar} alt="" className="size-9 rounded-full object-cover" />
-        <div className="min-w-0">
-          <p className="truncate text-sm font-medium">{execUser.name}</p>
-          <p className="truncate text-[11px] text-sidebar-foreground/60">{execUser.role}</p>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium">{profile?.fullName ?? "Executive"}</p>
+          <p className="truncate text-[11px] text-sidebar-foreground/60">
+            {profile?.jobTitle ?? profile?.email ?? ""}
+          </p>
         </div>
+        <button
+          onClick={handleSignOut}
+          aria-label="Sign out"
+          className="grid size-8 shrink-0 place-items-center rounded-lg text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
+        >
+          <LogOut className="size-4" />
+        </button>
       </div>
     </div>
   );
@@ -104,6 +128,8 @@ export function AppShell({
   const [mobileOpen, setMobileOpen] = useState(false);
   const [askOpen, setAskOpen] = useState(false);
   const unread = notifications.filter((n) => n.unread).length;
+  const { data: profile } = useProfile();
+  const firstName = (profile?.fullName ?? "Executive").split(" ")[0];
 
   return (
     <div className="min-h-screen bg-background">
@@ -149,7 +175,7 @@ export function AppShell({
                 {title}
               </h1>
               <p className="truncate text-xs text-muted-foreground">
-                {subtitle ?? `${greeting()}, ${execUser.name.split(" ")[0]} · ${todayLabel()}`}
+                {subtitle ?? `${greeting()}, ${firstName} · ${todayLabel()}`}
               </p>
             </div>
 
