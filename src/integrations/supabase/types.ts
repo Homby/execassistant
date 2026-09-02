@@ -14,6 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      assistant_preferences: {
+        Row: {
+          assistant_name: string
+          briefing_delivery: string
+          created_at: string
+          focus_areas: string | null
+          summary_length: string
+          timezone: string
+          tone: string
+          updated_at: string
+          user_id: string
+          working_hours: string
+        }
+        Insert: {
+          assistant_name?: string
+          briefing_delivery?: string
+          created_at?: string
+          focus_areas?: string | null
+          summary_length?: string
+          timezone?: string
+          tone?: string
+          updated_at?: string
+          user_id: string
+          working_hours?: string
+        }
+        Update: {
+          assistant_name?: string
+          briefing_delivery?: string
+          created_at?: string
+          focus_areas?: string | null
+          summary_length?: string
+          timezone?: string
+          tone?: string
+          updated_at?: string
+          user_id?: string
+          working_hours?: string
+        }
+        Relationships: []
+      }
+      calendar_connections: {
+        Row: {
+          account_email: string
+          calendar_url: string | null
+          created_at: string
+          id: string
+          provider: string
+          status: string
+          sync_mode: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_email: string
+          calendar_url?: string | null
+          created_at?: string
+          id?: string
+          provider: string
+          status?: string
+          sync_mode?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_email?: string
+          calendar_url?: string | null
+          created_at?: string
+          id?: string
+          provider?: string
+          status?: string
+          sync_mode?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
