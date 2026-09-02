@@ -8,6 +8,13 @@
       "when": 1788255792755,
       "tag": "0000_create_profiles",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788376689109,
+      "tag": "0001_assistant_preferences_and_calendar_connections",
+      "breakpoints": true
     }
   ]
 }
