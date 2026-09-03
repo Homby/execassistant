@@ -80,10 +80,10 @@ function SettingsPage() {
   const [savingPrefs, setSavingPrefs] = useState(false);
 
   const [cal, setCal] = useState({
-    provider: providers[0],
+    provider: providers[0]!,
     accountEmail: "",
     calendarUrl: "",
-    syncMode: syncModes[0],
+    syncMode: syncModes[0]!,
   });
   const [connecting, setConnecting] = useState(false);
 
