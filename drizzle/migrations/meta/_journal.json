@@ -15,6 +15,13 @@
       "when": 1788376689109,
       "tag": "0001_assistant_preferences_and_calendar_connections",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788519413955,
+      "tag": "0002_revoke_execute_security_definer_functions",
+      "breakpoints": true
     }
   ]
 }
