@@ -15,7 +15,9 @@ import {
   ShieldCheck,
   Sparkles,
   Sun,
+  UserRound,
   X,
+
 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import avatar from "@/assets/exec-avatar.jpg";
