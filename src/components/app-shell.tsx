@@ -35,8 +35,10 @@ const nav = [
   { to: "/email", label: "Email assistant", icon: Mail },
   { to: "/meetings", label: "Meeting notes", icon: NotebookPen },
   { to: "/tasks", label: "Task planner", icon: CheckSquare },
+  { to: "/profile", label: "Your profile", icon: UserRound },
   { to: "/security", label: "Privacy & security", icon: ShieldCheck },
   { to: "/settings", label: "Settings", icon: Settings },
+
 ] as const;
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
