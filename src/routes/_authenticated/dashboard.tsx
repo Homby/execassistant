@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { createFileRoute } from "@tanstack/react-router";
 import {
-  AlertTriangle,
   ArrowUpRight,
   CalendarDays,
   CheckSquare,
@@ -9,62 +8,78 @@ import {
   Mail,
   NotebookPen,
   Sparkles,
-  Users,
 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { AskAssistantPanel } from "@/components/ask-assistant";
-import { Panel, SectionLabel } from "@/components/panel";
-import { Badge } from "@/components/ui/badge";
+import { Panel } from "@/components/panel";
 import { Button } from "@/components/ui/button";
-import { communications, priorityLabel, tasks, todaysMeetings } from "@/lib/mock-data";
-import { cn } from "@/lib/utils";
+import { useCalendarConnections } from "@/hooks/use-assistant";
+import { useProfile } from "@/hooks/use-profile";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Exec Assistant — AI chief of staff for senior leaders" },
+      { title: "Dashboard — Exec Assistant" },
       {
         name: "description",
         content:
-          "An AI executive productivity hub: daily briefings, calendar triage, email drafting, meeting summaries and ruthless task prioritisation.",
+          "Your executive command centre: schedule load, priority tasks, communications needing a reply and AI briefings — all in one clean view.",
       },
-      { property: "og:title", content: "Exec Assistant — AI chief of staff" },
+      { property: "og:title", content: "Dashboard — Exec Assistant" },
       {
         property: "og:description",
         content:
-          "Reduce administrative load and decide faster with AI briefings, email drafting, meeting summaries and task prioritisation.",
+          "A clean executive command centre for schedule, tasks, communications and AI briefings.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Dashboard,
 });
 
-const priorityTone: Record<string, string> = {
-  critical: "bg-destructive/10 text-destructive",
-  high: "bg-warning/15 text-warning-foreground",
-  medium: "bg-accent/10 text-accent",
-  low: "bg-muted text-muted-foreground",
-};
+const stats = [
+  {
+    label: "Meetings today",
+    icon: CalendarDays,
+    hint: "Counts the meetings on your linked calendar for today, so you can see the day's load at a glance.",
+  },
+  {
+    label: "Open tasks",
+    icon: CheckSquare,
+    hint: "Everything still owed by you or your team, with overdue items surfaced first.",
+  },
+  {
+    label: "Prep outstanding",
+    icon: Clock,
+    hint: "Preparation time your assistant estimates you still need before your next commitments.",
+  },
+  {
+    label: "Needs a reply",
+    icon: Mail,
+    hint: "Messages flagged as important that are waiting on a decision or response from you.",
+  },
+];
+
+function EmptyNote({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="rounded-xl border border-dashed border-border p-4 text-sm leading-relaxed text-muted-foreground">
+      {children}
+    </p>
+  );
+}
 
 function Dashboard() {
-  const openTasks = tasks.filter((t) => !t.done);
-  const overdue = openTasks.filter((t) => t.overdue).length;
-  const meetingMinutes = todaysMeetings.reduce((n, m) => n + m.durationMin, 0);
-  const prepMinutes = todaysMeetings.reduce((n, m) => n + (m.prepReady ? 0 : m.prepMinutes), 0);
-  const important = communications.filter((c) => c.important);
-
-  const stats = [
-    { label: "Meetings today", value: String(todaysMeetings.length), hint: `${meetingMinutes} min booked`, icon: CalendarDays },
-    { label: "Open tasks", value: String(openTasks.length), hint: `${overdue} overdue`, icon: CheckSquare },
-    { label: "Prep outstanding", value: `${prepMinutes}m`, hint: "Before your next call", icon: Clock },
-    { label: "Needs a reply", value: String(important.length), hint: "Flagged as important", icon: Mail },
-  ];
+  const { data: profile } = useProfile();
+  const { data: calendars } = useCalendarConnections();
+  const firstName = (profile?.fullName ?? "there").split(" ")[0];
+  const hasCalendar = (calendars?.length ?? 0) > 0;
 
   return (
     <AppShell title="Dashboard">
       <div className="space-y-6">
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {stats.map(({ label, value, hint, icon: Icon }) => (
+          {stats.map(({ label, hint, icon: Icon }) => (
             <div
               key={label}
               className="rounded-2xl border border-border bg-surface p-5 shadow-[var(--shadow-card)]"
@@ -73,8 +88,8 @@ function Dashboard() {
                 <p className="label-caps mb-0">{label}</p>
                 <Icon className="size-4 text-accent" />
               </div>
-              <p className="mt-3 text-2xl font-semibold text-foreground">{value}</p>
-              <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
+              <p className="mt-3 text-2xl font-semibold text-muted-foreground/50">—</p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{hint}</p>
             </div>
           ))}
         </div>
@@ -85,13 +100,12 @@ function Dashboard() {
             Today at a glance
           </p>
           <p className="display-serif mt-3 max-w-2xl text-2xl leading-snug sm:text-3xl">
-            {overdue > 0
-              ? `Clear ${overdue} overdue item${overdue > 1 ? "s" : ""} before the ${todaysMeetings[0]?.title ?? "first meeting"}.`
-              : "Your day is under control — protect the board prep block."}
+            Welcome, {firstName}. Your workspace is empty and private.
           </p>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-foreground/70">
-            {todaysMeetings.length} meetings, {meetingMinutes} minutes booked, {prepMinutes} minutes
-            of preparation still outstanding.
+            {hasCalendar
+              ? "Your calendar is linked. Generate a briefing to have your assistant read the day and tell you what matters."
+              : "Link a calendar and add your first tasks — your assistant then fills this space with your real schedule, priorities and decisions to make."}
           </p>
           <div className="mt-5 flex flex-wrap gap-2">
             <Button asChild variant="secondary" size="sm" className="rounded-full">
@@ -106,7 +120,9 @@ function Dashboard() {
               size="sm"
               className="rounded-full text-ink-foreground hover:bg-ink-soft"
             >
-              <Link to="/calendar">Open calendar</Link>
+              <Link to={hasCalendar ? "/calendar" : "/profile"}>
+                {hasCalendar ? "Open calendar" : "Link a calendar"}
+              </Link>
             </Button>
           </div>
         </div>
@@ -120,46 +136,12 @@ function Dashboard() {
                 Full calendar
               </Link>
             }
-            bodyClassName="p-0"
           >
-            <ul className="divide-y divide-border">
-              {todaysMeetings.map((m) => (
-                <li key={m.id} className="flex gap-4 px-5 py-4">
-                  <div className="w-14 shrink-0 text-right">
-                    <p className="text-sm font-semibold text-foreground">{m.start}</p>
-                    <p className="text-[11px] text-muted-foreground">{m.durationMin}m</p>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-foreground">{m.title}</p>
-                    <p className="mt-0.5 truncate text-xs text-muted-foreground">{m.location}</p>
-                    {m.attendees.length > 0 && (
-                      <p className="mt-1 flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                        <Users className="size-3" />
-                        {m.attendees.join(", ")}
-                      </p>
-                    )}
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {m.conflict && (
-                        <Badge variant="destructive" className="gap-1 text-[10px]">
-                          <AlertTriangle className="size-3" />
-                          Conflict
-                        </Badge>
-                      )}
-                      {!m.prepReady && m.prepMinutes > 0 && (
-                        <Badge variant="secondary" className="text-[10px]">
-                          {m.prepMinutes}m prep needed
-                        </Badge>
-                      )}
-                      {m.prepReady && (
-                        <Badge variant="outline" className="text-[10px]">
-                          Prep ready
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <EmptyNote>
+              This is your timeline for the day, drawn from your linked calendars. Once connected it
+              shows each meeting with attendees, location, double bookings and how much preparation
+              time your assistant is protecting for you.
+            </EmptyNote>
           </Panel>
 
           <Panel
@@ -169,28 +151,11 @@ function Dashboard() {
                 Plan day
               </Link>
             }
-            bodyClassName="p-0"
           >
-            <ul className="divide-y divide-border">
-              {openTasks.slice(0, 5).map((t) => (
-                <li key={t.id} className="px-5 py-3.5">
-                  <div className="flex items-start justify-between gap-3">
-                    <p className="text-sm font-medium leading-snug text-foreground">{t.title}</p>
-                    <span
-                      className={cn(
-                        "shrink-0 rounded-md px-2 py-0.5 text-[10px] font-semibold",
-                        priorityTone[t.priority],
-                      )}
-                    >
-                      {priorityLabel[t.priority]}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {t.due} · {t.project} · ~{t.effortMin}m
-                  </p>
-                </li>
-              ))}
-            </ul>
+            <EmptyNote>
+              Your shortlist of what genuinely needs you today, ranked by impact and deadline. Add
+              tasks in the planner and your assistant will order them and suggest what to delegate.
+            </EmptyNote>
           </Panel>
         </div>
 
@@ -202,30 +167,25 @@ function Dashboard() {
                 Draft reply
               </Link>
             }
-            bodyClassName="p-0"
           >
-            <ul className="divide-y divide-border">
-              {communications.map((c) => (
-                <li key={c.id} className="px-5 py-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="truncate text-sm font-medium text-foreground">{c.from}</p>
-                    <Badge variant="outline" className="shrink-0 text-[10px]">
-                      {c.channel}
-                    </Badge>
-                  </div>
-                  <p className="mt-0.5 truncate text-sm text-foreground/80">{c.subject}</p>
-                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{c.preview}</p>
-                  <p className="mt-1 text-[11px] text-muted-foreground/70">{c.received}</p>
-                </li>
-              ))}
-            </ul>
+            <EmptyNote>
+              Communications waiting on a decision from you — the few messages worth your time,
+              summarised so you can approve, reply or delegate in seconds.
+            </EmptyNote>
           </Panel>
 
           <div className="space-y-6">
             <Panel title="Ask your assistant">
+              <p className="mb-4 text-sm leading-relaxed text-muted-foreground">
+                A private line to your AI chief of staff. Ask about your day, draft a message, or
+                think through a decision — nothing is stored or shared without your action.
+              </p>
               <AskAssistantPanel compact />
             </Panel>
             <Panel title="Quick actions" bodyClassName="p-4">
+              <p className="mb-3 px-1 text-sm leading-relaxed text-muted-foreground">
+                Shortcuts into the four tools you will use most.
+              </p>
               <div className="grid gap-2 sm:grid-cols-2">
                 {[
                   { to: "/email", label: "Write an email", icon: Mail },
