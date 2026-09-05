@@ -53,6 +53,30 @@ export type Database = {
         }
         Relationships: []
       }
+      briefings: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          kind: string
+          user_id: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          id?: string
+          kind?: string
+          user_id: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          kind?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       calendar_connections: {
         Row: {
           account_email: string
@@ -89,6 +113,117 @@ export type Database = {
         }
         Relationships: []
       }
+      calendar_events: {
+        Row: {
+          attendees: string | null
+          created_at: string
+          ends_at: string
+          id: string
+          location: string | null
+          notes: string | null
+          prep_minutes: number
+          starts_at: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attendees?: string | null
+          created_at?: string
+          ends_at: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          prep_minutes?: number
+          starts_at: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attendees?: string | null
+          created_at?: string
+          ends_at?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          prep_minutes?: number
+          starts_at?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      email_drafts: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          purpose: string | null
+          recipient: string | null
+          status: string
+          subject: string
+          tone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          id?: string
+          purpose?: string | null
+          recipient?: string | null
+          status?: string
+          subject?: string
+          tone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          purpose?: string | null
+          recipient?: string | null
+          status?: string
+          subject?: string
+          tone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      meeting_notes: {
+        Row: {
+          created_at: string
+          id: string
+          notes: string
+          summary: Json
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notes: string
+          summary?: Json
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notes?: string
+          summary?: Json
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -116,6 +251,54 @@ export type Database = {
           id?: string
           job_title?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          created_at: string
+          delegate_to: string | null
+          detail: string | null
+          done: boolean
+          due_date: string | null
+          effort_min: number
+          id: string
+          priority: string
+          project: string | null
+          source: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delegate_to?: string | null
+          detail?: string | null
+          done?: boolean
+          due_date?: string | null
+          effort_min?: number
+          id?: string
+          priority?: string
+          project?: string | null
+          source?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delegate_to?: string | null
+          detail?: string | null
+          done?: boolean
+          due_date?: string | null
+          effort_min?: number
+          id?: string
+          priority?: string
+          project?: string | null
+          source?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

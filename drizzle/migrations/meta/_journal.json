@@ -29,6 +29,13 @@
       "when": 1788533606962,
       "tag": "0003_avatar_storage_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788641885076,
+      "tag": "0004_create_exec_workspace_tables",
+      "breakpoints": true
     }
   ]
 }
