@@ -101,7 +101,11 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </div>
 
       <div className="flex items-center gap-3 border-t border-sidebar-border px-5 py-4">
-        <img src={avatar} alt="" className="size-9 rounded-full object-cover" />
+        <img
+          src={profile?.avatarUrl || avatar}
+          alt=""
+          className="size-9 rounded-full object-cover"
+        />
         <Link
           to="/profile"
           onClick={onNavigate}

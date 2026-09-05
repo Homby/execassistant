@@ -1,8 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CalendarCheck, Sparkles, Trash2, User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Camera, CalendarCheck, Sparkles, Trash2, User } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import avatar from "@/assets/exec-avatar.jpg";
 import { AppShell } from "@/components/app-shell";
@@ -14,7 +14,8 @@ import { Label } from "@/components/ui/label";
 import { useAssistantPreferences, useCalendarConnections } from "@/hooks/use-assistant";
 import { useProfile } from "@/hooks/use-profile";
 import { connectCalendar, disconnectCalendar } from "@/lib/assistant.functions";
-import { updateMyProfile } from "@/lib/profile.functions";
+import { supabase } from "@/integrations/supabase/client";
+import { setMyAvatar, updateMyProfile } from "@/lib/profile.functions";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
@@ -47,11 +48,14 @@ function ProfilePage() {
   const { data: calendars } = useCalendarConnections();
 
   const update = useServerFn(updateMyProfile);
+  const saveAvatar = useServerFn(setMyAvatar);
   const connect = useServerFn(connectCalendar);
   const disconnect = useServerFn(disconnectCalendar);
 
   const [form, setForm] = useState({ fullName: "", jobTitle: "", company: "" });
   const [saving, setSaving] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
 
   const [cal, setCal] = useState({
     provider: providers[0]!,
@@ -81,6 +85,38 @@ function ProfilePage() {
       toast.error("Could not save your profile. Please try again.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handlePhoto(file: File | undefined) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please choose an image file.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Please choose an image under 5MB.");
+      return;
+    }
+    setUploading(true);
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData.user?.id;
+      if (!userId) throw new Error("You are signed out.");
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${userId}/avatar-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { upsert: true, contentType: file.type });
+      if (error) throw new Error(error.message);
+      await saveAvatar({ data: { path } });
+      await queryClient.invalidateQueries({ queryKey: ["my-profile"] });
+      toast.success("Profile picture updated");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not update your picture.");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
     }
   }
 
@@ -120,7 +156,22 @@ function ProfilePage() {
           }
         >
           <div className="flex flex-wrap items-center gap-4">
-            <img src={avatar} alt="" className="size-16 rounded-full object-cover" />
+            <div className="relative">
+              <img
+                src={profile?.avatarUrl || avatar}
+                alt={profile?.fullName ? `${profile.fullName} profile picture` : "Profile picture"}
+                className="size-16 rounded-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading}
+                aria-label="Change profile picture"
+                className="absolute -bottom-1 -right-1 rounded-full border border-border bg-card p-1.5 text-foreground shadow-sm transition-colors hover:bg-muted disabled:opacity-60"
+              >
+                <Camera className="size-3.5" />
+              </button>
+            </div>
             <div className="min-w-0">
               <p className="text-sm font-semibold text-foreground">
                 {profile?.fullName ?? "Executive"}
@@ -129,6 +180,27 @@ function ProfilePage() {
                 {[profile?.jobTitle, profile?.company].filter(Boolean).join(" · ")}
               </p>
               <p className="text-xs text-muted-foreground">{profile?.email}</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => handlePhoto(e.target.files?.[0])}
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full"
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading}
+              >
+                {uploading ? "Uploading…" : "Change photo"}
+              </Button>
+              <p className="text-[11px] text-muted-foreground">
+                Private to you. JPG or PNG, up to 5MB.
+              </p>
             </div>
           </div>
 
